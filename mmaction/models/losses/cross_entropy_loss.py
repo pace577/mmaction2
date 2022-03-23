@@ -29,13 +29,17 @@ class CrossEntropyLoss(BaseWeightedLoss):
             as None, use the same weight 1 for all classes. Only applies
             to CrossEntropyLoss and BCELossWithLogits (should not be set when
             using other losses). Default: None.
+        logit_labels (Bool): If True, then the given targets are treated as
+            logits.  The targets will undergo a Softmax operation before
+            calculating loss.
     """
 
-    def __init__(self, loss_weight=1.0, class_weight=None):
+    def __init__(self, loss_weight=1.0, class_weight=None, logit_labels=False):
         super().__init__(loss_weight=loss_weight)
         self.class_weight = None
         if class_weight is not None:
             self.class_weight = torch.Tensor(class_weight)
+        self.logit_labels = logit_labels
 
     def _forward(self, cls_score, label, **kwargs):
         """Forward function.
@@ -58,6 +62,8 @@ class CrossEntropyLoss(BaseWeightedLoss):
                  f'but get {kwargs}')
 
             lsm = F.log_softmax(cls_score, 1)
+            if self.logit_labels:
+                label = F.softmax(label, dim=1)
             if self.class_weight is not None:
                 self.class_weight = self.class_weight.to(cls_score.device)
                 lsm = lsm * self.class_weight.unsqueeze(0)

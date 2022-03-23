@@ -17,6 +17,8 @@ from mmaction.datasets import build_dataloader, build_dataset
 from mmaction.models import build_model
 from mmaction.utils import register_module_hooks, setup_multi_processes
 
+from decord._ffi.base import DECORDError
+
 # TODO import test functions from mmcv and delete them from mmaction2
 try:
     from mmcv.engine import multi_gpu_test, single_gpu_test

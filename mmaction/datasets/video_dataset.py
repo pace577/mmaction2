@@ -1,5 +1,6 @@
 # Copyright (c) OpenMMLab. All rights reserved.
 import os.path as osp
+import pickle
 
 from .base import BaseDataset
 from .builder import DATASETS
@@ -36,22 +37,35 @@ class VideoDataset(BaseDataset):
         **kwargs: Keyword arguments for ``BaseDataset``.
     """
 
-    def __init__(self, ann_file, pipeline, start_index=0, **kwargs):
-        super().__init__(ann_file, pipeline, start_index=start_index, **kwargs)
+    def __init__(self, ann_file, pipeline, start_index=0, probability_labels=False, probability_labels_file=None, **kwargs):
+        super().__init__(ann_file, pipeline, start_index=start_index, probability_labels=probability_labels, probability_labels_file=probability_labels_file, **kwargs)
 
     def load_annotations(self):
-        """Load annotation file to get video information."""
+        """Load annotation file to get video information.
+        Loads probability labels if probability_labels_file is set (it must
+        be a path to a pickle file)."""
         if self.ann_file.endswith('.json'):
             return self.load_json_annotations()
 
+        if self.probability_labels_file and self.probability_labels_file.endswith('.pkl'):
+            with open(self.probability_labels_file, 'rb') as f:
+                probs = pickle.load(f)
+
         video_infos = []
         with open(self.ann_file, 'r') as fin:
-            for line in fin:
+            for idx, line in enumerate(fin):
                 line_split = line.strip().split()
                 if self.multi_class:
                     assert self.num_classes is not None
                     filename, label = line_split[0], line_split[1:]
                     label = list(map(int, label))
+                elif self.probability_labels:
+                    filename = line_split[0]
+                    if self.probability_labels_file is not None:
+                        label = probs[idx]
+                    else:
+                        label = line_split[1:]
+                        label = list(map(float, label))
                 else:
                     filename, label = line_split
                     label = int(label)

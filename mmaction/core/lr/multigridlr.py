@@ -17,8 +17,10 @@ class RelativeStepLrUpdaterHook(LrUpdaterHook):
                  runner,
                  steps,
                  lrs,
-                 warmup_epochs=34,
-                 warmuplr_start=0.01,
+                 #warmup_epochs=34,
+                 #warmuplr_start=0.01,
+                 warmup_epochs=5,
+                 warmuplr_start=0.001,
                  **kwargs):
         super().__init__(**kwargs)
         assert len(steps) == (len(lrs))

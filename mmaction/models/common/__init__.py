@@ -5,10 +5,11 @@ from .lfb import LFB
 from .sub_batchnorm3d import SubBatchNorm3D
 from .tam import TAM
 from .transformer import (DividedSpatialAttentionWithNorm,
-                          DividedTemporalAttentionWithNorm, FFNWithNorm)
+                          DividedTemporalAttentionWithNorm, FFNWithNorm,
+                          PositionalEnconding, Transformer)
 
 __all__ = [
     'Conv2plus1d', 'ConvAudio', 'LFB', 'TAM',
     'DividedSpatialAttentionWithNorm', 'DividedTemporalAttentionWithNorm',
-    'FFNWithNorm', 'SubBatchNorm3D'
+    'FFNWithNorm', 'SubBatchNorm3D', 'PositionalEnconding', 'Transformer'
 ]

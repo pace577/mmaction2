@@ -67,7 +67,9 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
                  modality='RGB',
                  sample_by_class=False,
                  power=0,
-                 dynamic_length=False):
+                 dynamic_length=False,
+                 probability_labels=False,
+                 probability_labels_file=None):
         super().__init__()
 
         self.ann_file = ann_file
@@ -82,6 +84,8 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
         self.sample_by_class = sample_by_class
         self.power = power
         self.dynamic_length = dynamic_length
+        self.probability_labels = probability_labels
+        self.probability_labels_file = probability_labels_file
 
         assert not (self.multi_class and self.sample_by_class)
 
@@ -259,6 +263,9 @@ class BaseDataset(Dataset, metaclass=ABCMeta):
             onehot = torch.zeros(self.num_classes)
             onehot[results['label']] = 1.
             results['label'] = onehot
+
+        if self.probability_labels and isinstance(results['label'], (list, np.ndarray)):
+            results['label'] = torch.Tensor(results['label'])
 
         return self.pipeline(results)
 
